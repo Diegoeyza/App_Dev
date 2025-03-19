@@ -28,3 +28,10 @@ Google Drive:
     and convert it to this
     https://drive.google.com/uc?id=FILE_ID
     - save all of the filenames and urls to pdfs.json
+
+Deploy:
+
+Install Vercel:
+npm install -g vercel
+Deploy:
+vercel
