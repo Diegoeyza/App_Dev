@@ -29,6 +29,22 @@ Google Drive:
     https://drive.google.com/uc?id=FILE_ID
     - save all of the filenames and urls to pdfs.json
 
+
+
+CORS policy:
+    use your own server:
+    create a directory for it, navigate to it, type:
+    git clone https://github.com/Rob--W/cors-anywhere.git
+    cd cors-anywhere
+    then do
+    npm install
+    and to run it do
+    node server.js
+
+
+
+
+
 Deploy:
 
 Install Vercel:
