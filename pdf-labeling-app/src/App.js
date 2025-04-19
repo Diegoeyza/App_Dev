@@ -17,11 +17,14 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwBJ2yMM9r7MeoYe-zAX4UA
 
 // Change this to your allowed users
 const ALLOWED_EMAILS = ["diegoeyzaguirreb@gmail.com", "friend@domain.com"];
+const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxpNzggEnrGudoPIXi7zAEQK-_GhQpfay2i6J98fWyA3ifmPC5jUcoercb-5cLSu1lywQ/exec";
+
 
 const App = () => {
   const [user, setUser] = useState(null);
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedLabel, setSelectedLabel] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -33,7 +36,7 @@ const App = () => {
     });
     return () => unsubscribe();
   }, []);
-
+  
   useEffect(() => {
     if (user) {
       fetch(API_URL)
@@ -58,6 +61,36 @@ const App = () => {
   const goPrev = () => setCurrentIndex((prev) => Math.max(prev - 1, 0));
   const goNext = () => setCurrentIndex((prev) => Math.min(prev + 1, images.length - 1));
   const goTo = (index) => setCurrentIndex(index);
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const url=SHEET_WEBHOOK_URL
+
+
+    if (!selectedLabel) return alert("Please select a label.");
+  
+    const current = images[currentIndex];
+    const payload = {
+      imageName: current.name,
+      imageUrl: current.url,
+      userName: user.displayName,
+      userEmail: user.email,
+      label: selectedLabel,
+      timestamp: new Date().toISOString(),
+    };
+
+    fetch(url,
+      {
+        method: 'POST',
+        redirect: 'follow',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(payload),
+    }).then(res=>res.text()).then(data=>{alert(data)}).catch(error=>console.log("Error!"))
+    console.log(payload)
+  };
+  
 
   if (!user) {
     return (
@@ -89,6 +122,24 @@ const App = () => {
             <div className="text-center">
               <p className="mb-2 font-semibold">{currentImage.name}</p>
               <img src={currentImage.url} alt={currentImage.name} className="max-w-full h-auto rounded" />
+              <div className="mt-4 flex items-center justify-center gap-2">
+              <select
+                value={selectedLabel}
+                onChange={(e) => setSelectedLabel(e.target.value)}
+                className="border px-3 py-1 rounded w-64"
+              >
+                <option value="">Select label</option>
+                <option value="Normal">Normal</option>
+                <option value="AFib">AFib</option>
+                <option value="Other">Other</option>
+              </select>
+              <button
+                onClick={handleSubmit}
+                className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
+              >
+                Submit
+              </button>
+            </div>
             </div>
             <button onClick={goNext} disabled={currentIndex === images.length - 1} className="text-2xl">
               ➡️
