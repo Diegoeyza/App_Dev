@@ -8,17 +8,19 @@ import {
   signOut,
 } from "firebase/auth";
 import { firebaseConfig } from "./firebaseConfig";
+import "./index.css";
 
 // Firebase init
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwBJ2yMM9r7MeoYe-zAX4UAQgMi93zsBEoPAAUBKhIXck6xPVTIoODrUoqp4F0Nk2wp/exec";
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbwBJ2yMM9r7MeoYe-zAX4UAQgMi93zsBEoPAAUBKhIXck6xPVTIoODrUoqp4F0Nk2wp/exec";
 
 // Change this to your allowed users
 const ALLOWED_EMAILS = ["diegoeyzaguirreb@gmail.com", "friend@domain.com"];
-const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxpNzggEnrGudoPIXi7zAEQK-_GhQpfay2i6J98fWyA3ifmPC5jUcoercb-5cLSu1lywQ/exec";
-
+const SHEET_WEBHOOK_URL =
+  "https://script.google.com/macros/s/AKfycbxpNzggEnrGudoPIXi7zAEQK-_GhQpfay2i6J98fWyA3ifmPC5jUcoercb-5cLSu1lywQ/exec";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -36,7 +38,7 @@ const App = () => {
     });
     return () => unsubscribe();
   }, []);
-  
+
   useEffect(() => {
     if (user) {
       fetch(API_URL)
@@ -63,12 +65,11 @@ const App = () => {
   const goTo = (index) => setCurrentIndex(index);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    const url=SHEET_WEBHOOK_URL
-
+    e.preventDefault();
+    const url = SHEET_WEBHOOK_URL;
 
     if (!selectedLabel) return alert("Please select a label.");
-  
+
     const current = images[currentIndex];
     const payload = {
       imageName: current.name,
@@ -79,23 +80,26 @@ const App = () => {
       timestamp: new Date().toISOString(),
     };
 
-    fetch(url,
-      {
-        method: 'POST',
-        redirect: 'follow',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
-        body: JSON.stringify(payload),
-    }).then(res=>res.text()).then(data=>{alert(data)}).catch(error=>console.log("Error!"))
-    console.log(payload)
+    fetch(url, {
+      method: "POST",
+      redirect: "follow",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.text())
+      .then((data) => {
+        alert(data);
+      })
+      .catch((error) => console.log("Error!"));
+    console.log(payload);
   };
-  
 
   if (!user) {
     return (
-      <div className="h-screen flex justify-center items-center">
-        <button onClick={login} className="bg-blue-500 text-white px-4 py-2 rounded">
+      <div className="auth-container">
+        <button onClick={login} className="button login-button">
           Login with Google
         </button>
       </div>
@@ -105,56 +109,51 @@ const App = () => {
   const currentImage = images[currentIndex];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between mb-4">
-        <h1 className="text-xl font-bold">Welcome, {user.displayName}</h1>
-        <button onClick={logout} className="bg-red-500 text-white px-4 py-2 rounded">
+    <div className="app-container">
+      <div className="header">
+        <h1>Welcome, {user.displayName}</h1>
+        <button onClick={logout} className="button logout-button">
           Logout
         </button>
       </div>
 
       {currentImage ? (
         <>
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <button onClick={goPrev} disabled={currentIndex === 0} className="text-2xl">
+          <div className="image-container">
+            <button onClick={goPrev} disabled={currentIndex === 0} className="arrow-button">
               ⬅️
             </button>
-            <div className="text-center">
-              <p className="mb-2 font-semibold">{currentImage.name}</p>
-              <img src={currentImage.url} alt={currentImage.name} className="max-w-full h-auto rounded" />
-              <div className="mt-4 flex items-center justify-center gap-2">
-              <select
-                value={selectedLabel}
-                onChange={(e) => setSelectedLabel(e.target.value)}
-                className="border px-3 py-1 rounded w-64"
-              >
-                <option value="">Select label</option>
-                <option value="Normal">Normal</option>
-                <option value="AFib">AFib</option>
-                <option value="Other">Other</option>
-              </select>
-              <button
-                onClick={handleSubmit}
-                className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
-              >
-                Submit
-              </button>
+            <div className="image-content">
+              <p className="image-name">{currentImage.name}</p>
+              <img src={currentImage.url} alt={currentImage.name} className="image" />
+              <div className="label-section">
+                <select
+                  value={selectedLabel}
+                  onChange={(e) => setSelectedLabel(e.target.value)}
+                  className="label-select"
+                >
+                  <option value="">Select label</option>
+                  <option value="Normal">Normal</option>
+                  <option value="AFib">AFib</option>
+                  <option value="Other">Other</option>
+                </select>
+                <button onClick={handleSubmit} className="submit-button">
+                  Submit
+                </button>
+              </div>
             </div>
-            </div>
-            <button onClick={goNext} disabled={currentIndex === images.length - 1} className="text-2xl">
+            <button onClick={goNext} disabled={currentIndex === images.length - 1} className="arrow-button">
               ➡️
             </button>
           </div>
 
-          <div className="overflow-x-auto whitespace-nowrap border-t pt-4 mt-4">
+          <div className="image-thumbnails">
             {images.map((img, index) => (
               <button
                 key={index}
                 onClick={() => goTo(index)}
-                className={`inline-block mx-2 px-4 py-1 rounded-full border ${
-                  index === currentIndex
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white text-blue-500 border-blue-300 hover:bg-blue-100"
+                className={`thumbnail-button ${
+                  index === currentIndex ? "active" : ""
                 }`}
               >
                 {img.name}
