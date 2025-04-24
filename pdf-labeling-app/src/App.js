@@ -98,7 +98,8 @@ const App = () => {
 
   if (!user) {
     return (
-      <div className="auth-container">
+      <div className="login-container">
+        <h1 id="app-title">Image Labeling App</h1>
         <button onClick={login} className="button login-button">
           Login with Google
         </button>
@@ -126,6 +127,7 @@ const App = () => {
             <div className="image-content">
               <p className="image-name">{currentImage.name}</p>
               <img src={currentImage.url} alt={currentImage.name} className="image" />
+              <a href={currentImage.url} className="image-link">Image Link</a>
               <div className="label-section">
                 <select
                   value={selectedLabel}
